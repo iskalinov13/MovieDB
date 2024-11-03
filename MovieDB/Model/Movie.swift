@@ -7,7 +7,6 @@
 
 import Foundation
 import UIKit
-
 struct Movie {
     let image = UIImage(named: "movie")
     let title = "Uncharted"
