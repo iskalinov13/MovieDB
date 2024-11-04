@@ -17,13 +17,14 @@ class MovieViewController: UIViewController {
         return tableView
     }()
     
-    private let movies = Array(repeating: Movie(), count: 10)
+    private var movies: [Movie] = []
     
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .white
         navigationItem.title = "MovieDB"
         layoutUI()
+        getMovies()
     }
     
     private func layoutUI() {
@@ -36,6 +37,13 @@ class MovieViewController: UIViewController {
             
         ])
     }
+    
+    private func getMovies() {
+        NetworkingManager.shared.getMovies { movies in
+            self.movies = movies
+            self.movieTableView.reloadData()
+        }
+    }
 }
 
 extension MovieViewController: UITableViewDataSource, UITableViewDelegate {
@@ -44,9 +52,12 @@ extension MovieViewController: UITableViewDataSource, UITableViewDelegate {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = movieTableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath) as! MovieTableViewCell
-        cell.movieImage.image = movies[indexPath.row].image
+        let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath) as! MovieTableViewCell
         cell.title.text = movies[indexPath.row].title
+        
+        NetworkingManager.shared.loadImage(porterPath: movies[indexPath.row].posterPath) { image in
+            cell.movieImage.image = image
+        }
         return cell
     }
 }
